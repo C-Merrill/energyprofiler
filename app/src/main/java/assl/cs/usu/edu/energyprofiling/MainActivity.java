@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,11 +98,20 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Profiler", averagePower.invoke(powerProInstance, new Object[]{"cpu.active", 2}).toString());
             Log.d("Profiler", averagePower.invoke(powerProInstance, new Object[]{"cpu.active", 3}).toString());
 
-
+	        List<Integer> testList = new ArrayList<Integer>();
+	        for (int i=1; i<=100; i++) {
+                testList.add(i);
+            }
+	        Collections.shuffle(testList);
+            Log.d("sorting",testList.toString());
+	    
             Profiler.getInstance().start();
             //do something
-            bubblesSort();
+            //bubblesSort(testList);
+	        quickSort(testList);
             double energy = Profiler.getInstance().stop();
+            Log.i("energy",Double.toString(energy));
+            Log.d("sorting",testList.toString());
 
         } catch (Exception e) {e.printStackTrace();}
     }
@@ -152,13 +162,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void bubblesSort() {
+    private void bubblesSort(List<Integer> list) {
         //write a bubble sort algorithm here
         for(int i = 0; i < 100; i++) {
-            for(int j = 0; j < 100; j++) {
-                //sort
+            for(int j = 0; j < 99; j++) {
+                if (list.get(j)>list.get(j+1)){
+		            Collections.swap(list,j,j+1);
+		        }
             }
         }
     }
 
+    private void quickSort(List<Integer> list){
+        quickSort(list,0,list.size()-1);
+    }
+
+    private void quickSort(List<Integer> list, int begin, int end) {
+        if (begin >= end) return;
+	    int p = partition(list, begin, end);
+	    quickSort(list,begin,p-1);
+	    quickSort(list,p+1,end);
+    }
+
+    private int partition(List<Integer> list, int begin, int end){
+	    int i=begin;
+	    int j=end-1;
+	    while(i<j){
+	        while(i<j&&list.get(i)<list.get(end)) i++;
+	        while(i<j&&list.get(j)>list.get(end)) j--;
+	        if (i<j)Collections.swap(list,i,j);
+	    }
+	    Collections.swap(list,end,i);
+	    return i;
+    }
 }
